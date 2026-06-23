@@ -89,6 +89,25 @@
   .modal label { font-size: 13px; color: #5f6368; display: block; margin-bottom: 4px; margin-top: 12px; }
   .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
 
+  
+  .status-update-btn {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#fff;
+    border:1px solid #dadce0;
+    border-radius:20px;
+    padding:8px 14px;
+    cursor:pointer;
+    font-family:'Google Sans', sans-serif;
+    font-size:14px;
+    font-weight:500;
+    color:#202124;
+  }
+  .status-update-btn:hover { background:#f8f9fa; }
+  .status-update-btn .ti-bell { color:#ea4335; font-size:18px; }
+
+
   /* Notification bell */
   .notif-btn { position: relative; background: none; border: none; cursor: pointer; padding: 4px; }
   .notif-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ea4335; border-radius: 50%; border: 2px solid #fff; }
@@ -262,9 +281,9 @@
       <span style="font-weight:300; color:#5f6368; margin-left:4px; font-size:20px">Report</span>
     </div>
     <div class="topbar-right">
-      <button class="notif-btn" onclick="toggleNotif()" id="notif-btn" aria-label="Notifications">
-        <i class="ti ti-bell" style="font-size:22px; color:#5f6368;"></i>
-        <span class="notif-dot" id="notif-dot"></span>
+      <button class="status-update-btn" onclick="toggleNotif()" id="notif-btn" aria-label="Status Updates">
+        <i class="ti ti-bell"></i>
+        <span>Status Updates</span>
       </button>
       <button class="sign-out-btn" onclick="signOut()">Sign out</button>
       <div class="avatar" id="applicant-avatar" style="background:#34a853;">A</div>
@@ -334,6 +353,19 @@ var state = {
 
 var LEADER = { email: 'vathukrishnaswamy@gmail.com', pass: 'gray10Five' };
 
+function saveState(){ localStorage.setItem('googleReportState', JSON.stringify(state)); }
+function loadState(){
+  try{
+    var saved = localStorage.getItem('googleReportState');
+    if(saved){
+      var data = JSON.parse(saved);
+      state.reports = data.reports || [];
+      state.applicants = data.applicants || [];
+    }
+  }catch(e){}
+}
+loadState();
+
 function showPage(id) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
@@ -352,6 +384,7 @@ function leaderLogin() {
     showPage('page-leader');
     renderReports();
     renderApplicants();
+    saveState();
   } else {
     err.style.display = 'block';
   }
@@ -435,6 +468,8 @@ function saveReport() {
   state.reports.push(report);
   hideAddReport();
   renderReports();
+  renderApplicants();
+  saveState();
 }
 
 function renderReports() {
@@ -445,7 +480,7 @@ function renderReports() {
   }
   el.innerHTML = state.reports.map(function(r){
     var pct = r.scoreDen > 0 ? Math.round((r.scoreNum / r.scoreDen) * 100) : 0;
-    return '<div class="report-card"><div class="report-card-title">'+escHtml(r.name)+'</div><div class="report-meta"><span class="score-badge">'+r.scoreNum+' / '+r.scoreDen+' &nbsp;('+pct+'%)</span></div></div>';
+    return '<div class="report-card"><div class="report-card-title">'+escHtml(r.name)+'</div><div class="report-meta"><span class="score-badge">'+r.scoreNum+' / '+r.scoreDen+' &nbsp;('+pct+'%)</span><button class="g-btn-outline" style="margin-left:10px;padding:4px 10px" onclick="deleteReport('+r.id+')">Delete</button></div></div>';
   }).join('');
 }
 
@@ -469,6 +504,7 @@ function saveApplicant() {
   state.applicants.push(applicant);
   closeModal('modal-add-applicant');
   renderApplicants();
+  saveState();
 }
 
 function renderApplicants() {
@@ -494,8 +530,25 @@ function renderApplicants() {
       +(state.reports.length ? '<select class="g-select" id="report-sel-'+ai+'"><option value="">Select a report...</option>'+reportOpts+'</select>'
         +'<button class="g-btn" onclick="assignReport('+ai+')" style="padding:8px 16px;font-size:13px;">Add report</button>'
         : '<span style="font-size:13px;color:#9aa0a6;">Create reports first</span>')
-      +'</div></div>';
+      +'<button class="g-btn-outline" style="margin-top:10px" onclick="deleteApplicant('+ai+')">Delete Applicant</button>'+'</div></div>';
   }).join('');
+}
+
+
+function deleteReport(rid){
+  state.reports = state.reports.filter(function(r){ return r.id !== rid; });
+  state.applicants.forEach(function(a){
+    a.assignedReports = (a.assignedReports||[]).filter(function(x){ return x !== rid; });
+  });
+  renderReports();
+  renderApplicants();
+  saveState();
+}
+
+function deleteApplicant(ai){
+  state.applicants.splice(ai,1);
+  renderApplicants();
+  saveState();
 }
 
 function assignReport(ai) {
@@ -505,6 +558,7 @@ function assignReport(ai) {
   if (!state.applicants[ai].assignedReports.includes(rid)) {
     state.applicants[ai].assignedReports.push(rid);
     renderApplicants();
+    saveState();
   }
 }
 
@@ -525,11 +579,11 @@ function renderNotifications() {
   var items = document.getElementById('notif-items');
   var dot = document.getElementById('notif-dot');
   if (!a.assignedReports || !a.assignedReports.length) {
-    dot.style.display = 'none';
+    if(dot) dot.style.display = 'none';
     items.innerHTML = '<div style="padding:16px 20px; font-size:14px; color:#9aa0a6;">No notifications yet.</div>';
     return;
   }
-  dot.style.display = 'block';
+  if(dot) dot.style.display = 'block';
   items.innerHTML = a.assignedReports.map(function(rid){
     var r = state.reports.find(function(x){ return x.id === rid; });
     if (!r) return '';
@@ -580,13 +634,12 @@ function backToHome() {
 
 function launchConfetti() {
   if (typeof confetti === 'undefined') return;
-  var end = Date.now() + 2200;
   var colors = ['#4285F4','#EA4335','#FBBC05','#34A853'];
-  (function frame(){
-    confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x:0}, colors: colors });
-    confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x:1}, colors: colors });
-    if (Date.now() < end) requestAnimationFrame(frame);
-  })();
+  confetti({particleCount:200, spread:120, colors:colors, origin:{y:0.6}});
+  setTimeout(function(){
+    confetti({particleCount:150, spread:100, colors:colors, origin:{x:0.2,y:0.6}});
+    confetti({particleCount:150, spread:100, colors:colors, origin:{x:0.8,y:0.6}});
+  },300);
 }
 
 function escHtml(s) {
