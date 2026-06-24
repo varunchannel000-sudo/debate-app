@@ -1,666 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reinforced Deepslate</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.5.1/confetti.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body, #app { font-family: 'Roboto', Arial, sans-serif; background: #fff; color: #202124; }
-  .page { display: none; min-height: 600px; }
-  .page.active { display: block; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: #f5f5f5;
+        }
 
-  /* Google colors */
-  .g-blue { color: #1a73e8; }
-  .g-red { color: #ea4335; }
-  .g-yellow { color: #fbbc04; }
-  .g-green { color: #34a853; }
+        .header {
+            background: white;
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            display: none;
+        }
 
-  /* Login page */
-  .login-bg { background: #fff; min-height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .login-logo { display: flex; align-items: center; gap: 2px; font-size: 36px; font-weight: 700; font-family: 'Google Sans', sans-serif; margin-bottom: 8px; }
-  .login-logo span { letter-spacing: -1px; }
-  .login-subtitle { font-size: 16px; color: #5f6368; margin-bottom: 32px; font-family: 'Google Sans'; }
-  .login-box { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 40px 48px; width: 360px; }
-  .login-box h2 { font-family: 'Google Sans'; font-weight: 400; font-size: 24px; text-align: center; color: #202124; margin-bottom: 8px; }
-  .login-box p { text-align: center; color: #5f6368; font-size: 14px; margin-bottom: 24px; }
-  .g-input { width: 100%; border: 1px solid #dadce0; border-radius: 4px; padding: 13px 15px; font-size: 16px; outline: none; font-family: Roboto; color: #202124; background: #fff; transition: border 0.2s; margin-bottom: 12px; }
-  .g-input:focus { border: 2px solid #1a73e8; padding: 12px 14px; }
-  .g-btn { background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 10px 24px; font-size: 14px; font-family: 'Google Sans'; font-weight: 500; cursor: pointer; transition: background 0.2s, box-shadow 0.2s; }
-  .g-btn:hover { background: #1765cc; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-  .g-btn-outline { background: transparent; color: #1a73e8; border: 1px solid #dadce0; border-radius: 4px; padding: 10px 24px; font-size: 14px; font-family: 'Google Sans'; font-weight: 500; cursor: pointer; }
-  .g-btn-outline:hover { background: #f8f9ff; }
-  .login-footer { text-align: center; margin-top: 20px; font-size: 14px; color: #5f6368; }
-  .login-footer a { color: #1a73e8; text-decoration: none; cursor: pointer; }
-  .error-msg { color: #ea4335; font-size: 12px; margin-top: -8px; margin-bottom: 8px; display: none; }
+        .header.active {
+            display: block;
+        }
 
-  /* Top bar */
-  .topbar { background: #fff; border-bottom: 1px solid #e8eaed; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .topbar-logo { display: flex; align-items: center; gap: 6px; font-size: 22px; font-weight: 700; font-family: 'Google Sans'; }
-  .topbar-right { display: flex; align-items: center; gap: 12px; }
-  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #1a73e8; color: #fff; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  .sign-out-btn { font-size: 13px; color: #5f6368; cursor: pointer; border: 1px solid #dadce0; border-radius: 4px; padding: 6px 12px; background: #fff; font-family: Roboto; }
-  .sign-out-btn:hover { background: #f8f9fa; }
+        .header-flex {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-  /* Tabs */
-  .tabs { border-bottom: 1px solid #e8eaed; display: flex; padding: 0 24px; background: #fff; }
-  .tab { padding: 16px 20px; font-size: 14px; font-weight: 500; color: #5f6368; cursor: pointer; border-bottom: 3px solid transparent; font-family: 'Google Sans'; transition: color 0.2s; }
-  .tab:hover { color: #1a73e8; background: #f8f9ff; }
-  .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+        }
 
-  /* Content area */
-  .content { padding: 24px; max-width: 900px; margin: 0 auto; }
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .section-title { font-size: 20px; font-family: 'Google Sans'; font-weight: 400; color: #202124; }
+        .logout-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
 
-  /* Report card */
-  .report-card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
-  .report-card-title { font-size: 16px; font-weight: 500; font-family: 'Google Sans'; color: #202124; margin-bottom: 8px; }
-  .report-meta { font-size: 13px; color: #5f6368; display: flex; gap: 16px; align-items: center; }
-  .score-badge { background: #e8f0fe; color: #1a73e8; padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 500; }
+        .logout-btn:hover {
+            background: #1a1a1a;
+        }
 
-  /* Editor toolbar */
-  .editor-toolbar { display: flex; gap: 4px; padding: 8px; border: 1px solid #dadce0; border-bottom: none; border-radius: 4px 4px 0 0; background: #f8f9fa; flex-wrap: wrap; align-items: center; }
-  .tool-btn { background: transparent; border: none; border-radius: 4px; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #444746; transition: background 0.15s; }
-  .tool-btn:hover { background: #e8eaed; }
-  .tool-btn.active { background: #e8f0fe; color: #1a73e8; }
-  .tool-sep { width: 1px; height: 24px; background: #dadce0; margin: 0 4px; }
-  .editor-area { width: 100%; border: 1px solid #dadce0; border-radius: 0 0 4px 4px; padding: 14px; font-size: 15px; font-family: Roboto; outline: none; min-height: 220px; color: #202124; resize: vertical; line-height: 1.6; }
-  .editor-area:focus { border-color: #1a73e8; border-width: 2px; padding: 13px; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-  /* Score field */
-  .score-row { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
-  .score-label { font-size: 14px; color: #5f6368; font-family: 'Google Sans'; }
-  .score-input { width: 56px; border: 1px solid #dadce0; border-radius: 4px; padding: 8px; font-size: 14px; text-align: center; outline: none; color: #202124; background: #fff; }
-  .score-input:focus { border-color: #1a73e8; border-width: 2px; }
-  .score-slash { font-size: 18px; color: #5f6368; }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-  /* Applicant card */
-  .applicant-card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
-  .applicant-name { font-size: 16px; font-weight: 500; font-family: 'Google Sans'; color: #202124; margin-bottom: 4px; }
-  .applicant-email { font-size: 13px; color: #5f6368; margin-bottom: 12px; }
-  .report-assign { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .g-select { border: 1px solid #dadce0; border-radius: 4px; padding: 8px 12px; font-size: 14px; background: #fff; color: #202124; outline: none; cursor: pointer; font-family: Roboto; }
-  .g-select:focus { border-color: #1a73e8; }
-  .chip { background: #e8f0fe; color: #1a73e8; border-radius: 16px; padding: 4px 12px; font-size: 13px; display: flex; align-items: center; gap: 6px; }
-  .chip-remove { cursor: pointer; font-size: 16px; color: #5f6368; }
+        .login-card {
+            background: white;
+            padding: 50px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            width: 100%;
+            max-width: 420px;
+        }
 
-  /* Modal */
-  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: none; align-items: center; justify-content: center; }
-  .modal-backdrop.open { display: flex; }
-  .modal { background: #fff; border-radius: 8px; padding: 32px; width: 420px; max-width: 95vw; }
-  .modal h3 { font-family: 'Google Sans'; font-size: 20px; font-weight: 400; margin-bottom: 20px; color: #202124; }
-  .modal label { font-size: 13px; color: #5f6368; display: block; margin-bottom: 4px; margin-top: 12px; }
-  .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+        .login-card h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #333;
+        }
 
-  
-  .status-update-btn {
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:#fff;
-    border:1px solid #dadce0;
-    border-radius:20px;
-    padding:8px 14px;
-    cursor:pointer;
-    font-family:'Google Sans', sans-serif;
-    font-size:14px;
-    font-weight:500;
-    color:#202124;
-  }
-  .status-update-btn:hover { background:#f8f9fa; }
-  .status-update-btn .ti-bell { color:#ea4335; font-size:18px; }
+        .login-card .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
 
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-  /* Notification bell */
-  .notif-btn { position: relative; background: none; border: none; cursor: pointer; padding: 4px; }
-  .notif-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ea4335; border-radius: 50%; border: 2px solid #fff; }
-  .notif-panel { position: absolute; right: 60px; top: 60px; background: #fff; border: 1px solid #dadce0; border-radius: 8px; width: 320px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 150; display: none; }
-  .notif-panel.open { display: block; }
-  .notif-header { padding: 16px 20px; border-bottom: 1px solid #e8eaed; font-family: 'Google Sans'; font-size: 16px; font-weight: 500; }
-  .notif-item { padding: 16px 20px; border-bottom: 1px solid #f1f3f4; cursor: pointer; transition: background 0.15s; }
-  .notif-item:hover { background: #f8f9fa; }
-  .notif-item-title { font-size: 14px; font-weight: 500; color: #202124; margin-bottom: 4px; }
-  .notif-item-sub { font-size: 13px; color: #5f6368; }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #333;
+        }
 
-  /* Score modal */
-  .score-display { text-align: center; padding: 24px 0; }
-  .score-pct { font-size: 56px; font-weight: 700; font-family: 'Google Sans'; }
-  .score-pct.pass { color: #34a853; }
-  .score-pct.fail { color: #ea4335; }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
 
-  /* Report view */
-  .report-view { background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 8px; padding: 24px; margin-top: 16px; font-size: 15px; line-height: 1.7; color: #202124; white-space: pre-wrap; }
-  .report-name-big { font-size: 22px; font-family: 'Google Sans'; font-weight: 500; margin-bottom: 16px; color: #202124; }
+        .form-group input:focus {
+            outline: none;
+            border-color: #333;
+        }
 
-  /* Confetti canvas */
-  #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; }
+        .sign-in-btn {
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
 
-  /* Misc */
-  .empty-state { text-align: center; padding: 48px 0; color: #9aa0a6; }
-  .empty-state i { font-size: 48px; display: block; margin-bottom: 12px; }
-  .role-btns { display: flex; gap: 16px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
-  .role-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 28px; border: 1px solid #dadce0; border-radius: 8px; cursor: pointer; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; min-width: 140px; }
-  .role-btn:hover { border-color: #1a73e8; box-shadow: 0 1px 6px rgba(26,115,232,0.2); }
-  .role-btn i { font-size: 32px; }
-  .role-btn span { font-size: 15px; font-family: 'Google Sans'; color: #202124; }
-  .add-report-form { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 24px; margin-bottom: 24px; }
-</style>
+        .sign-in-btn:hover {
+            background: #1a1a1a;
+        }
 
-<canvas id="confetti-canvas"></canvas>
+        .sign-in-btn:active {
+            transform: scale(0.98);
+        }
 
-<div id="app">
+        .error-msg {
+            color: #d32f2f;
+            font-size: 13px;
+            margin-top: 15px;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 4px;
+            display: none;
+        }
 
-<!-- ===== LANDING: Choose Role ===== -->
-<div class="page active" id="page-landing">
-  <div class="login-bg">
-    <div class="login-logo">
-      <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>
-      <span style="font-weight:300; color:#5f6368; margin-left:6px; font-size:28px">Report</span>
+        .welcome-container {
+            display: none;
+        }
+
+        .welcome-container.active {
+            display: block;
+        }
+
+        .welcome-card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .welcome-card h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .welcome-card p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .status-section {
+            margin: 40px 0;
+        }
+
+        .status-box {
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px solid;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .status-box.admission {
+            background: #e8f5e9;
+            border-color: #2e7d32;
+            color: #1b5e20;
+        }
+
+        .status-box.deferral {
+            background: #fff3e0;
+            border-color: #f57c00;
+            color: #e65100;
+        }
+
+        .status-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .status-description {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .view-letter-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .view-letter-btn:hover {
+            background: #1a1a1a;
+        }
+
+        .view-letter-btn:active {
+            transform: scale(0.98);
+        }
+
+        .letter-section {
+            display: none;
+        }
+
+        .letter-section.show {
+            display: block;
+        }
+
+        .letter-card {
+            background: white;
+            padding: 50px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            line-height: 1.8;
+        }
+
+        .letter-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .letter-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .letter-header p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .letter-info {
+            margin: 30px 0;
+            font-size: 14px;
+        }
+
+        .letter-date {
+            font-size: 13px;
+            color: #666;
+            margin: 20px 0 30px 0;
+        }
+
+        .letter-body p {
+            margin-bottom: 15px;
+            text-align: justify;
+            color: #333;
+        }
+
+        .letter-closing {
+            margin-top: 50px;
+        }
+
+        .signature-space {
+            height: 60px;
+        }
+
+        .back-btn {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background: #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+
+            .letter-card {
+                padding: 30px 20px;
+            }
+
+            .welcome-card {
+                padding: 30px 20px;
+            }
+
+            .login-card h1 {
+                font-size: 24px;
+            }
+
+            .welcome-card h1 {
+                font-size: 24px;
+            }
+
+            .status-box {
+                padding: 20px;
+            }
+
+            .status-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header" id="header">
+    <div class="header-flex">
+        <div class="logo">Reinforced Deepslate</div>
+        <button class="logout-btn" onclick="logoutFunc()">Log Out</button>
     </div>
-    <div class="login-subtitle">Choose your portal to continue</div>
-    <div class="role-btns">
-      <div class="role-btn" onclick="showLogin('leader')">
-        <i class="ti ti-shield-check" style="color:#1a73e8"></i>
-        <span>Leader</span>
-      </div>
-      <div class="role-btn" onclick="showLogin('applicant')">
-        <i class="ti ti-user" style="color:#34a853"></i>
-        <span>Applicant</span>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- ===== LOGIN: Leader ===== -->
-<div class="page" id="page-login-leader">
-  <div class="login-bg">
-    <div class="login-logo">
-      <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>
-      <span style="font-weight:300; color:#5f6368; margin-left:6px; font-size:28px">Report</span>
+<div class="login-container" id="loginSection">
+    <div class="login-card">
+        <h1>Reinforced Deepslate</h1>
+        <p class="subtitle">Application Status Portal</p>
+
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="emailField" placeholder="your.email@example.com">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="passwordField" placeholder="••••••••">
+        </div>
+
+        <div class="error-msg" id="errorMsg"></div>
+
+        <button class="sign-in-btn" onclick="signInFunc()">Sign In</button>
     </div>
-    <div class="login-box">
-      <h2>Sign in</h2>
-      <p>Leader Portal</p>
-      <input class="g-input" id="leader-email" type="email" placeholder="Email" autocomplete="off">
-      <input class="g-input" id="leader-pass" type="password" placeholder="Password">
-      <div class="error-msg" id="leader-error">Wrong email or password. Please try again.</div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-        <span class="login-footer" style="margin:0"><a onclick="showPage('page-landing')">← Back</a></span>
-        <button class="g-btn" onclick="leaderLogin()">Next</button>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- ===== LOGIN: Applicant ===== -->
-<div class="page" id="page-login-applicant">
-  <div class="login-bg">
-    <div class="login-logo">
-      <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>
-      <span style="font-weight:300; color:#5f6368; margin-left:6px; font-size:28px">Report</span>
+<div class="welcome-container" id="welcomeSection">
+    <div class="container">
+        <div class="welcome-card">
+            <h1 id="welcomeText"></h1>
+            <p>Your application status has been updated</p>
+
+            <div class="status-section" id="statusSection">
+                <div class="status-box" id="statusBox">
+                    <div class="status-title" id="statusTitle"></div>
+                    <div class="status-description" id="statusDescription"></div>
+                    <button class="view-letter-btn" onclick="viewLetter()">View Letter</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="letter-section" id="letterSection">
+            <div class="letter-card" id="letterContent"></div>
+            <button class="back-btn" onclick="backToStatus()">← Back to Status</button>
+        </div>
     </div>
-    <div class="login-box">
-      <h2>Sign in</h2>
-      <p>Applicant Portal</p>
-      <input class="g-input" id="applicant-email" type="email" placeholder="Email" autocomplete="off">
-      <input class="g-input" id="applicant-pass" type="password" placeholder="Password">
-      <div class="error-msg" id="applicant-error">Wrong email or password. Please try again.</div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-        <span class="login-footer" style="margin:0"><a onclick="showPage('page-landing')">← Back</a></span>
-        <button class="g-btn" onclick="applicantLogin()">Next</button>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- ===== LEADER DASHBOARD ===== -->
-<div class="page" id="page-leader">
-  <div class="topbar">
-    <div class="topbar-logo">
-      <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>
-      <span style="font-weight:300; color:#5f6368; margin-left:4px; font-size:20px">Report</span>
-    </div>
-    <div class="topbar-right">
-      <button class="sign-out-btn" onclick="signOut()">Sign out</button>
-      <div class="avatar" title="Leader">L</div>
-    </div>
-  </div>
-  <div class="tabs">
-    <div class="tab active" id="tab-reports" onclick="leaderTab('reports')">Reports</div>
-    <div class="tab" id="tab-applicants" onclick="leaderTab('applicants')">Applicants</div>
-  </div>
-
-  <!-- Reports Tab -->
-  <div class="content" id="leader-reports-tab">
-    <div class="section-header">
-      <div class="section-title">Reports</div>
-      <button class="g-btn" onclick="showAddReport()">+ New report</button>
-    </div>
-    <div class="add-report-form" id="add-report-form" style="display:none;">
-      <div style="font-size:16px; font-family:'Google Sans'; margin-bottom:16px; color:#202124;">Create report</div>
-      <input class="g-input" id="new-report-name" placeholder="Report title" style="margin-bottom:12px;">
-      <div class="editor-toolbar" id="editor-toolbar">
-        <button class="tool-btn" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
-        <button class="tool-btn" onclick="execCmd('italic')" title="Italic"><i>I</i></button>
-        <button class="tool-btn" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
-        <div class="tool-sep"></div>
-        <button class="tool-btn" title="Ordered list" onclick="execCmd('insertOrderedList')">1.</button>
-        <button class="tool-btn" title="Bullet list" onclick="execCmd('insertUnorderedList')">•</button>
-        <button class="tool-btn" title="Checkbox" onclick="insertCheckbox()">☑</button>
-        <div class="tool-sep"></div>
-        <button class="tool-btn" title="Horizontal rule" onclick="execCmd('insertHorizontalRule')">—</button>
-        <button class="tool-btn" title="Number format" onclick="formatNumber()"><span style="font-size:12px">123</span></button>
-      </div>
-      <div class="editor-area" id="report-editor" contenteditable="true" spellcheck="true" style="border-radius:0 0 4px 4px;"></div>
-      <div class="score-row">
-        <span class="score-label">Score:</span>
-        <input class="score-input" id="score-num" type="number" placeholder="0" min="0">
-        <span class="score-slash">/</span>
-        <input class="score-input" id="score-den" type="number" placeholder="100" min="1">
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:16px;">
-        <button class="g-btn-outline" onclick="hideAddReport()">Cancel</button>
-        <button class="g-btn" onclick="saveReport()">Save report</button>
-      </div>
-    </div>
-    <div id="reports-list"></div>
-  </div>
-
-  <!-- Applicants Tab -->
-  <div class="content" id="leader-applicants-tab" style="display:none;">
-    <div class="section-header">
-      <div class="section-title">Applicants</div>
-      <button class="g-btn" onclick="openAddApplicantModal()">+ Add applicant</button>
-    </div>
-    <div id="applicants-list"></div>
-  </div>
-</div>
-
-<!-- ===== APPLICANT PORTAL ===== -->
-<div class="page" id="page-applicant">
-  <div class="topbar" style="position:relative;">
-    <div class="topbar-logo">
-      <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>
-      <span style="font-weight:300; color:#5f6368; margin-left:4px; font-size:20px">Report</span>
-    </div>
-    <div class="topbar-right">
-      <button class="status-update-btn" onclick="toggleNotif()" id="notif-btn" aria-label="Status Updates">
-        <i class="ti ti-bell"></i>
-        <span>Status Updates</span>
-      </button>
-      <button class="sign-out-btn" onclick="signOut()">Sign out</button>
-      <div class="avatar" id="applicant-avatar" style="background:#34a853;">A</div>
-    </div>
-    <div class="notif-panel" id="notif-panel">
-      <div class="notif-header"><i class="ti ti-bell" style="font-size:16px; vertical-align:-2px; margin-right:6px;"></i>Notifications</div>
-      <div id="notif-items"></div>
-    </div>
-  </div>
-  <div class="content">
-    <div id="applicant-home">
-      <div style="padding: 40px 0 0; text-align:center;">
-        <i class="ti ti-circle-check" style="font-size:48px; color:#34a853; display:block; margin-bottom:12px;"></i>
-        <div style="font-size:22px; font-family:'Google Sans'; color:#202124; margin-bottom:8px;">Welcome to your portal</div>
-        <div style="color:#5f6368; font-size:15px;">Click the bell icon above to view your notifications and scores.</div>
-      </div>
-    </div>
-    <div id="applicant-score-view" style="display:none;"></div>
-    <div id="applicant-report-view" style="display:none;"></div>
-  </div>
-</div>
-
-<!-- Add Applicant Modal -->
-<div class="modal-backdrop" id="modal-add-applicant">
-  <div class="modal">
-    <h3>Add applicant</h3>
-    <label>Full name</label>
-    <input class="g-input" id="new-applicant-name" placeholder="Jane Doe" style="margin-top:4px;">
-    <label>Email</label>
-    <input class="g-input" id="new-applicant-email" type="email" placeholder="jane@example.com" style="margin-top:4px;">
-    <label>Password</label>
-    <input class="g-input" id="new-applicant-pass" type="password" placeholder="Set a password" style="margin-top:4px;">
-    <div class="modal-actions">
-      <button class="g-btn-outline" onclick="closeModal('modal-add-applicant')">Cancel</button>
-      <button class="g-btn" onclick="saveApplicant()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- Score/Report Modal -->
-<div class="modal-backdrop" id="modal-score">
-  <div class="modal">
-    <h3 id="score-modal-title">Score</h3>
-    <div class="score-display">
-      <div class="score-pct" id="score-modal-pct"></div>
-      <div style="font-size:14px; color:#5f6368; margin-top:8px;" id="score-modal-raw"></div>
-    </div>
-    <div style="text-align:center;">
-      <button class="g-btn" onclick="showApplicantReport()">View Report</button>
-    </div>
-    <div style="text-align:right; margin-top:16px;">
-      <button class="g-btn-outline" onclick="closeModal('modal-score')">Close</button>
-    </div>
-  </div>
-</div>
-
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
 <script>
-var state = {
-  reports: [],
-  applicants: [],
-  currentApplicant: null,
-  notifOpen: false
-};
+    const accounts = {
+        'naunidhbhushan@gmail.com': {
+            pass: 'capybara123',
+            name: 'Naunidh',
+            type: 'admission'
+        },
+        'vathukrishnaswamy@gmail.com': {
+            pass: 'gray10Five',
+            name: 'Varun',
+            type: 'admission'
+        },
+        'abhaykrishnan@gmail.com': {
+            pass: 'cheetahrules123!',
+            name: 'Abhay',
+            type: 'deferral'
+        }
+    };
 
-var LEADER = { email: 'vathukrishnaswamy@gmail.com', pass: 'gray10Five' };
+    let currentUser = null;
 
-function saveState(){ localStorage.setItem('googleReportState', JSON.stringify(state)); }
-function loadState(){
-  try{
-    var saved = localStorage.getItem('googleReportState');
-    if(saved){
-      var data = JSON.parse(saved);
-      state.reports = data.reports || [];
-      state.applicants = data.applicants || [];
+    function signInFunc() {
+        const email = document.getElementById('emailField').value;
+        const password = document.getElementById('passwordField').value;
+        const errorBox = document.getElementById('errorMsg');
+
+        if (accounts[email] && accounts[email].pass === password) {
+            currentUser = {
+                email: email,
+                name: accounts[email].name,
+                type: accounts[email].type
+            };
+
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('welcomeSection').classList.add('active');
+            document.getElementById('header').classList.add('active');
+
+            displayWelcome();
+            launchConfetti();
+        } else {
+            errorBox.textContent = 'Invalid email or password';
+            errorBox.style.display = 'block';
+        }
     }
-  }catch(e){}
-}
-loadState();
 
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
-}
+    function logoutFunc() {
+        currentUser = null;
+        document.getElementById('loginSection').style.display = 'flex';
+        document.getElementById('welcomeSection').classList.remove('active');
+        document.getElementById('header').classList.remove('active');
+        document.getElementById('emailField').value = '';
+        document.getElementById('passwordField').value = '';
+        document.getElementById('errorMsg').style.display = 'none';
+        document.getElementById('letterSection').classList.remove('show');
+        document.getElementById('statusSection').style.display = 'block';
+    }
 
-function showLogin(role) {
-  showPage('page-login-' + role);
-}
+    function displayWelcome() {
+        const name = currentUser.name;
+        const type = currentUser.type;
 
-function leaderLogin() {
-  var email = document.getElementById('leader-email').value.trim();
-  var pass = document.getElementById('leader-pass').value;
-  var err = document.getElementById('leader-error');
-  if (email === LEADER.email && pass === LEADER.pass) {
-    err.style.display = 'none';
-    showPage('page-leader');
-    renderReports();
-    renderApplicants();
-    saveState();
-  } else {
-    err.style.display = 'block';
-  }
-}
+        document.getElementById('welcomeText').textContent = 'Welcome, ' + name;
 
-function applicantLogin() {
-  var email = document.getElementById('applicant-email').value.trim();
-  var pass = document.getElementById('applicant-pass').value;
-  var err = document.getElementById('applicant-error');
-  var found = state.applicants.find(function(a){ return a.email === email && a.pass === pass; });
-  if (found) {
-    err.style.display = 'none';
-    state.currentApplicant = found;
-    var av = document.getElementById('applicant-avatar');
-    av.textContent = found.name.charAt(0).toUpperCase();
-    showPage('page-applicant');
-    renderNotifications();
-    document.getElementById('applicant-score-view').style.display = 'none';
-    document.getElementById('applicant-report-view').style.display = 'none';
-    document.getElementById('applicant-home').style.display = 'block';
-  } else {
-    err.style.display = 'block';
-  }
-}
+        if (type === 'admission') {
+            document.getElementById('statusBox').classList.remove('deferral');
+            document.getElementById('statusBox').classList.add('admission');
+            document.getElementById('statusTitle').textContent = '✓ Admission Letter';
+            document.getElementById('statusDescription').textContent = 'Congratulations! A new admission letter to your application at Reinforced Deepslate has been posted to your account.';
+        } else {
+            document.getElementById('statusBox').classList.remove('admission');
+            document.getElementById('statusBox').classList.add('deferral');
+            document.getElementById('statusTitle').textContent = '⏳ Application Deferred';
+            document.getElementById('statusDescription').textContent = 'A deferral letter to your application at Reinforced Deepslate has been posted to your account.';
+        }
+    }
 
-function signOut() {
-  state.currentApplicant = null;
-  state.notifOpen = false;
-  document.getElementById('notif-panel').classList.remove('open');
-  document.getElementById('leader-email').value = '';
-  document.getElementById('leader-pass').value = '';
-  document.getElementById('applicant-email').value = '';
-  document.getElementById('applicant-pass').value = '';
-  showPage('page-landing');
-}
+    function viewLetter() {
+        const name = currentUser.name;
+        const type = currentUser.type;
+        const email = currentUser.email;
 
-function leaderTab(tab) {
-  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.getElementById('leader-reports-tab').style.display = tab === 'reports' ? 'block' : 'none';
-  document.getElementById('leader-applicants-tab').style.display = tab === 'applicants' ? 'block' : 'none';
-}
+        document.getElementById('statusSection').style.display = 'none';
+        document.getElementById('letterSection').classList.add('show');
 
-function showAddReport() {
-  document.getElementById('add-report-form').style.display = 'block';
-  document.getElementById('new-report-name').value = '';
-  document.getElementById('report-editor').innerHTML = '';
-  document.getElementById('score-num').value = '';
-  document.getElementById('score-den').value = '';
-}
+        createLetter(name, type, email);
+    }
 
-function hideAddReport() {
-  document.getElementById('add-report-form').style.display = 'none';
-}
+    function backToStatus() {
+        document.getElementById('letterSection').classList.remove('show');
+        document.getElementById('statusSection').style.display = 'block';
+    }
 
-function execCmd(cmd) {
-  document.getElementById('report-editor').focus();
-  document.execCommand(cmd, false, null);
-}
+    function createLetter(name, type, email) {
+        const dateObj = new Date();
+        const date = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-function insertCheckbox() {
-  document.getElementById('report-editor').focus();
-  document.execCommand('insertHTML', false, '<input type="checkbox" style="margin-right:6px;"> ');
-}
+        let html = '<div class="letter-header"><h2>Reinforced Deepslate</h2><p>Office of Admissions</p></div>';
+        html += '<div class="letter-info"><div style="font-weight: 500;">' + name + '</div><div>' + email + '</div></div>';
+        html += '<div class="letter-date">' + date + '</div>';
+        html += '<div class="letter-body">';
 
-function formatNumber() {
-  var sel = window.getSelection();
-  if (sel && sel.toString()) {
-    var n = parseFloat(sel.toString());
-    if (!isNaN(n)) document.execCommand('insertText', false, n.toLocaleString());
-  }
-}
+        if (type === 'admission') {
+            html += '<p>Dear ' + name + ',</p>';
+            html += '<p>On behalf of the admissions committee at Reinforced Deepslate, it is a pleasure to offer you admission to our institution for the upcoming academic year. Your academic achievements, intellectual curiosity, and potential contributions to our community have impressed our review committee.</p>';
+            html += '<p>We were particularly impressed by your demonstrated commitment to excellence and your unique perspectives that will enrich our diverse student body. We believe you will thrive in our rigorous academic environment and contribute meaningfully to the intellectual and cultural life of our institution.</p>';
+            html += '<p>Your admission is contingent upon continued academic performance and adherence to ethical standards. To secure your place in the incoming class, we ask that you submit your enrollment deposit by the deadline specified in the accompanying materials.</p>';
+            html += '<p>We encourage you to explore our campus, connect with current students and faculty, and learn more about the opportunities that await you at Reinforced Deepslate. Additional information regarding financial aid, housing, and orientation programs will be sent to you shortly.</p>';
+            html += '<p>Congratulations again on your admission. We look forward to welcoming you to our community and supporting your academic and personal growth.</p>';
+        } else {
+            html += '<p>Dear ' + name + ',</p>';
+            html += '<p>Thank you for your application to Reinforced Deepslate. The admissions committee has carefully reviewed your credentials and academic record. While your application demonstrates strong qualities, we have decided to defer a final decision on your admission at this time.</p>';
+            html += '<p>This deferral reflects the exceptional competitiveness of the applicant pool rather than any deficiency in your qualifications. We would like to learn more about your continued achievements and involvement during the remainder of your academic career before making a final determination.</p>';
+            html += '<p>We encourage you to update us on any significant academic or personal developments that have occurred since you submitted your application. Additional information may strengthen your candidacy as we continue our evaluation process.</p>';
+            html += '<p>We will make a final decision on your application by the conclusion of the regular admissions cycle. You will be notified of our decision via mail and email. In the meantime, we encourage you to maintain contact with our admissions office if you have any questions.</p>';
+            html += '<p>Thank you for your interest in Reinforced Deepslate. We appreciate the opportunity to consider your application.</p>';
+        }
 
-function saveReport() {
-  var name = document.getElementById('new-report-name').value.trim();
-  var content = document.getElementById('report-editor').innerHTML;
-  var num = parseInt(document.getElementById('score-num').value) || 0;
-  var den = parseInt(document.getElementById('score-den').value) || 100;
-  if (!name) { alert('Please enter a report title.'); return; }
-  var report = { id: Date.now(), name: name, content: content, scoreNum: num, scoreDen: den };
-  state.reports.push(report);
-  hideAddReport();
-  renderReports();
-  renderApplicants();
-  saveState();
-}
+        html += '</div>';
+        html += '<div class="letter-closing"><div class="signature-space"></div><p><strong>Sincerely,</strong></p><p>Office of Admissions<br>Reinforced Deepslate</p></div>';
 
-function renderReports() {
-  var el = document.getElementById('reports-list');
-  if (!state.reports.length) {
-    el.innerHTML = '<div class="empty-state"><i class="ti ti-file-description"></i>No reports yet. Create your first one.</div>';
-    return;
-  }
-  el.innerHTML = state.reports.map(function(r){
-    var pct = r.scoreDen > 0 ? Math.round((r.scoreNum / r.scoreDen) * 100) : 0;
-    return '<div class="report-card"><div class="report-card-title">'+escHtml(r.name)+'</div><div class="report-meta"><span class="score-badge">'+r.scoreNum+' / '+r.scoreDen+' &nbsp;('+pct+'%)</span><button class="g-btn-outline" style="margin-left:10px;padding:4px 10px" onclick="deleteReport('+r.id+')">Delete</button></div></div>';
-  }).join('');
-}
+        document.getElementById('letterContent').innerHTML = html;
+    }
 
-function openAddApplicantModal() {
-  document.getElementById('new-applicant-name').value = '';
-  document.getElementById('new-applicant-email').value = '';
-  document.getElementById('new-applicant-pass').value = '';
-  document.getElementById('modal-add-applicant').classList.add('open');
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-
-function saveApplicant() {
-  var name = document.getElementById('new-applicant-name').value.trim();
-  var email = document.getElementById('new-applicant-email').value.trim();
-  var pass = document.getElementById('new-applicant-pass').value;
-  if (!name || !email || !pass) { alert('Please fill all fields.'); return; }
-  var applicant = { id: Date.now(), name: name, email: email, pass: pass, assignedReports: [] };
-  state.applicants.push(applicant);
-  closeModal('modal-add-applicant');
-  renderApplicants();
-  saveState();
-}
-
-function renderApplicants() {
-  var el = document.getElementById('applicants-list');
-  if (!state.applicants.length) {
-    el.innerHTML = '<div class="empty-state"><i class="ti ti-users"></i>No applicants yet. Add one to get started.</div>';
-    return;
-  }
-  el.innerHTML = state.applicants.map(function(a, ai){
-    var reportOpts = state.reports.map(function(r){
-      return '<option value="'+r.id+'">'+escHtml(r.name)+'</option>';
-    }).join('');
-    var chips = a.assignedReports.map(function(rid){
-      var r = state.reports.find(function(x){ return x.id === rid; });
-      if (!r) return '';
-      return '<span class="chip">'+escHtml(r.name)+'<span class="chip-remove" onclick="removeReport('+ai+','+rid+')">×</span></span>';
-    }).join('');
-    return '<div class="applicant-card">'
-      +'<div class="applicant-name">'+escHtml(a.name)+'</div>'
-      +'<div class="applicant-email">'+escHtml(a.email)+'</div>'
-      +'<div class="report-assign" style="margin-bottom:10px;">'+(chips || '<span style="font-size:13px;color:#9aa0a6;">No reports assigned</span>')+'</div>'
-      +'<div style="display:flex;gap:8px;align-items:center;">'
-      +(state.reports.length ? '<select class="g-select" id="report-sel-'+ai+'"><option value="">Select a report...</option>'+reportOpts+'</select>'
-        +'<button class="g-btn" onclick="assignReport('+ai+')" style="padding:8px 16px;font-size:13px;">Add report</button>'
-        : '<span style="font-size:13px;color:#9aa0a6;">Create reports first</span>')
-      +'<button class="g-btn-outline" style="margin-top:10px" onclick="deleteApplicant('+ai+')">Delete Applicant</button>'+'</div></div>';
-  }).join('');
-}
-
-
-function deleteReport(rid){
-  state.reports = state.reports.filter(function(r){ return r.id !== rid; });
-  state.applicants.forEach(function(a){
-    a.assignedReports = (a.assignedReports||[]).filter(function(x){ return x !== rid; });
-  });
-  renderReports();
-  renderApplicants();
-  saveState();
-}
-
-function deleteApplicant(ai){
-  state.applicants.splice(ai,1);
-  renderApplicants();
-  saveState();
-}
-
-function assignReport(ai) {
-  var sel = document.getElementById('report-sel-' + ai);
-  var rid = parseInt(sel.value);
-  if (!rid) return;
-  if (!state.applicants[ai].assignedReports.includes(rid)) {
-    state.applicants[ai].assignedReports.push(rid);
-    renderApplicants();
-    saveState();
-  }
-}
-
-function removeReport(ai, rid) {
-  state.applicants[ai].assignedReports = state.applicants[ai].assignedReports.filter(function(r){ return r !== rid; });
-  renderApplicants();
-}
-
-function toggleNotif() {
-  var panel = document.getElementById('notif-panel');
-  state.notifOpen = !state.notifOpen;
-  if (state.notifOpen) panel.classList.add('open'); else panel.classList.remove('open');
-}
-
-function renderNotifications() {
-  var a = state.currentApplicant;
-  if (!a) return;
-  var items = document.getElementById('notif-items');
-  var dot = document.getElementById('notif-dot');
-  if (!a.assignedReports || !a.assignedReports.length) {
-    if(dot) dot.style.display = 'none';
-    items.innerHTML = '<div style="padding:16px 20px; font-size:14px; color:#9aa0a6;">No notifications yet.</div>';
-    return;
-  }
-  if(dot) dot.style.display = 'block';
-  items.innerHTML = a.assignedReports.map(function(rid){
-    var r = state.reports.find(function(x){ return x.id === rid; });
-    if (!r) return '';
-    return '<div class="notif-item" onclick="viewScore('+rid+')">'
-      +'<div class="notif-item-title"><i class="ti ti-file-certificate" style="font-size:14px;vertical-align:-1px;margin-right:4px;color:#1a73e8;"></i>'+escHtml(r.name)+'</div>'
-      +'<div class="notif-item-sub">Tap to view your score</div>'
-      +'</div>';
-  }).join('');
-}
-
-var currentReportId = null;
-function viewScore(rid) {
-  currentReportId = rid;
-  var r = state.reports.find(function(x){ return x.id === rid; });
-  if (!r) return;
-  document.getElementById('notif-panel').classList.remove('open');
-  state.notifOpen = false;
-  var pct = r.scoreDen > 0 ? Math.round((r.scoreNum / r.scoreDen) * 100) : 0;
-  var el = document.getElementById('score-modal-pct');
-  el.textContent = pct + '%';
-  el.className = 'score-pct ' + (pct >= 75 ? 'pass' : 'fail');
-  document.getElementById('score-modal-raw').textContent = r.scoreNum + ' / ' + r.scoreDen;
-  document.getElementById('score-modal-title').textContent = r.name;
-  document.getElementById('modal-score').classList.add('open');
-  if (pct >= 75) {
-    launchConfetti();
-  }
-}
-
-function showApplicantReport() {
-  var r = state.reports.find(function(x){ return x.id === currentReportId; });
-  if (!r) return;
-  closeModal('modal-score');
-  document.getElementById('applicant-home').style.display = 'none';
-  document.getElementById('applicant-score-view').style.display = 'none';
-  var rv = document.getElementById('applicant-report-view');
-  rv.style.display = 'block';
-  rv.innerHTML = '<button class="g-btn-outline" onclick="backToHome()" style="margin-bottom:20px;">← Back</button>'
-    + '<div class="report-name-big">'+escHtml(r.name)+'</div>'
-    + '<div class="report-view">'+r.content+'</div>';
-}
-
-function backToHome() {
-  document.getElementById('applicant-home').style.display = 'block';
-  document.getElementById('applicant-report-view').style.display = 'none';
-  document.getElementById('applicant-score-view').style.display = 'none';
-}
-
-function launchConfetti() {
-  if (typeof confetti === 'undefined') return;
-  var colors = ['#4285F4','#EA4335','#FBBC05','#34A853'];
-  confetti({particleCount:200, spread:120, colors:colors, origin:{y:0.6}});
-  setTimeout(function(){
-    confetti({particleCount:150, spread:100, colors:colors, origin:{x:0.2,y:0.6}});
-    confetti({particleCount:150, spread:100, colors:colors, origin:{x:0.8,y:0.6}});
-  },300);
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-document.addEventListener('keydown', function(e){
-  if (e.key === 'Enter') {
-    var ap = document.getElementById('page-login-applicant');
-    var lp = document.getElementById('page-login-leader');
-    if (ap.classList.contains('active')) applicantLogin();
-    if (lp.classList.contains('active')) leaderLogin();
-  }
-});
-
-document.addEventListener('click', function(e){
-  var panel = document.getElementById('notif-panel');
-  var btn = document.getElementById('notif-btn');
-  if (state.notifOpen && !panel.contains(e.target) && !btn.contains(e.target)) {
-    panel.classList.remove('open');
-    state.notifOpen = false;
-  }
-});
+    function launchConfetti() {
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    }
 </script>
+
+</body>
+</html>
